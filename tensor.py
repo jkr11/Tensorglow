@@ -115,6 +115,16 @@ class ReLU(Function):
     return grad_input
 register('relu', ReLU)
 
+class GeLU(Function):
+  @staticmethod
+  def forward(ctx, input):
+    ctx.save_for_backward(input)
+    gelu = 0.5*input* (1 + np.tanh(np.sqrt(2/np.pi) * (input + 0.044715 * input**3)))
+    return gelu
+  @staticmethod
+  def backward(ctx, grad_output):
+    
+
 class Dot(Function):
   @staticmethod
   def forward(ctx, input, weight):
