@@ -4,39 +4,32 @@ from functools import partialmethod
 
 class Tensor:
   def __init__(self, data):
-    #print(type(data), data)
-    if type(data) != np.ndarray:
-      print("error constructing tensor with %r" % data)
-      assert(False)
+    #print(f"Using Tensor of type {type(data)} with {data}")
     self.data = data
     self.grad = None
-
-    # internal variables used for autograd graph construction
-    self._ctx = None
+    self.context = None
 
   def __repr__(self):
     return "Tensor %r with grad %r" % (self.data, self.grad)
 
   def backward(self, allow_fill=True):
     #print("running backward on", self)
-    if self._ctx is None:
+    if self.context is None:
       return
 
     if self.grad is None and allow_fill:
-      # fill in the first grad with one
-      # this is "implicit gradient creation"
-      assert self.data.size == 1
+      assert self.data.size == 1 # 1 because of implicit gradient creation 
       self.grad = np.ones_like(self.data)
 
-    assert(self.grad is not None)
+    # assert(self.grad is not None)
 
-    grads = self._ctx.backward(self._ctx, self.grad)
-    if len(self._ctx.parents) == 1:
+    grads = self.context.backward(self.context, self.grad)
+    if len(self.context.parents) == 1:
       grads = [grads]
-    for t,g in zip(self._ctx.parents, grads):
+    for t,g in zip(self.context.parents, grads):
       if g.shape != t.data.shape:
         print("grad shape must match tensor shape in %r, %r != %r" %
-          (self._ctx, g.shape, t.data.shape))
+          (self.context, g.shape, t.data.shape))
         assert(False)
       t.grad = g
       t.backward(False)
@@ -56,7 +49,7 @@ class Tensor:
     return Tensor(np.argmax(self.data, axis=axis))
   
   def flatten(self):
-    return self.data.reshape((-1,))
+    return self.data.reshape((-1, ))
 
 # An instantiation of the Function is the Context
 class Function:
@@ -71,13 +64,12 @@ class Function:
   def apply(self, arg, *x):
     ctx = arg(self, *x)
     ret = Tensor(arg.forward(ctx, self.data, *[t.data for t in x]))
-    ret._ctx = ctx
+    ret.context = ctx
     return ret
 
 def register(name, fxn):
   setattr(Tensor, name, partialmethod(fxn.apply, fxn))
 
-# **** implement a few functions ****
 
 class Mul(Function):
   @staticmethod
