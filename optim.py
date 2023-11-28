@@ -2,9 +2,6 @@
 from tensor import Tensor
 import numpy as np
 
-
-
-
 class Optimizer:
     def __init__(self, params):
         self.params = params
@@ -101,9 +98,3 @@ class Adam(Optimizer):
             vhat = self.v[i] / (1. - self.b2**self.t)
             t.data -= self.lr * mhat / (np.sqrt(vhat) + self.eps)
             #t.data -= denom * self.m[i] / (np.sqrt(self.v[i]) + self.eps)
-        
-
-
-
-
-
