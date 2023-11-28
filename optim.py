@@ -38,7 +38,7 @@ class RMSProp(Optimizer):
 
     def step(self):
         for i,t in enumerate(self.params):
-            self.s[i] = self.mu * self.s[i-1] + (1 - self.mu) * t.grad.data**2
+            self.s[i] = self.mu * self.s[i] + (1 - self.mu) * t.grad.data**2
             t.data -= (self.lr / (np.sqrt(self.s[i] + self.eps)))*t.grad.data
 
 
@@ -60,9 +60,9 @@ class Adadelta(Optimizer):
         for i,t in enumerate(self.params):
             if self.decay != 0:
                 t.grad.data = t.grad.data + self.decay * t.data
-            self.v[i] = self.v[i-1] * self.rho + np.square(t.grad.data)*(1 - self.rho)
-            dx = (np.sqrt(self.u[i-1] + self.eps))/(np.sqrt(self.v[i] + self.eps)) * t.grad.data
-            self.u[i] = self.u[i-1] * self.rho + np.square(dx) * (1 - self.rho)
+            self.v[i] = self.v[i] * self.rho + np.square(t.grad.data)*(1 - self.rho)
+            dx = (np.sqrt(self.u[i] + self.eps))/(np.sqrt(self.v[i] + self.eps)) * t.grad.data
+            self.u[i] = self.u[i] * self.rho + np.square(dx) * (1 - self.rho)
             t.data = t.data - self.lr * dx
 
 
