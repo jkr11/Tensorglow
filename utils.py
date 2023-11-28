@@ -24,7 +24,9 @@ def NLLLoss(out, Y):
     y = Tensor(y)
     return out.mul(y).mean()
 
-
+def uniform_init(n,m):
+  ret = np.random.uniform(-1., 1., size=(n,m))/np.sqrt(n*m)
+  return ret.astype(np.float32)
 
 
 

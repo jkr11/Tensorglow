@@ -3,19 +3,17 @@ import numpy as np
 from datasets import fetch_mnist
 from tqdm import trange
 from optim import Adam, SGD, Adadelta, RMSProp
-from utils import training_loop
+from utils import uniform_init
 
-def layer_init_uniform(m,n):
-  ret = np.random.uniform(-1., 1., size=(m,n))/np.sqrt(m*n)
-  return ret.astype(np.float32)
+
 
 X_train, Y_train, X_test, Y_test = fetch_mnist()
 
 # create a model
 class TinyBobNet:
   def __init__(self):
-    self.l1 = Tensor(layer_init_uniform(784, 128))
-    self.l2 = Tensor(layer_init_uniform(128, 10))
+    self.l1 = Tensor(uniform_init(784, 128))
+    self.l2 = Tensor(uniform_init(128, 10))
 
   def forward(self, x):
     return x.dot(self.l1).relu().dot(self.l2).logsoftmax()
