@@ -115,6 +115,7 @@ class ReLU(Function):
     return grad_input
 register('relu', ReLU)
 
+"""
 class GeLU(Function):
   @staticmethod
   def forward(ctx, input):
@@ -123,6 +124,7 @@ class GeLU(Function):
     return gelu
   @staticmethod
   def backward(ctx, grad_output):
+"""   
     
 
 class Dot(Function):
