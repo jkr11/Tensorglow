@@ -38,7 +38,7 @@ class RMSProp(Optimizer):
 
     def step(self):
         for i,t in enumerate(self.params):
-            self.s[i] = self.mu * self.s[i] + (1 - self.mu) * t.grad.data**2
+            self.s[i] = self.mu * self.s[i] + (1 - self.mu) * t.grad**2
             t.data -= (self.lr / (np.sqrt(self.s[i] + self.eps)))*t.grad.data
 
 
