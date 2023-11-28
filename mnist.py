@@ -1,9 +1,8 @@
 from tensor import Tensor
 import numpy as np
-from datasets import fetch_mnist
 from tqdm import trange
 from optim import Adam, SGD, Adadelta, RMSProp
-from utils import uniform_init
+from utils import uniform_init, fetch_mnist
 
 
 
