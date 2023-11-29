@@ -86,12 +86,13 @@ class Adam(Optimizer):
         
         # save calculating vhat and mhat & 2 in-loop multiplications
         #denom = self.lr * (np.sqrt(1 - np.power(self.b2, self.t)) / (1 - np.power(self.b1, self.t)))
+
         for i, t in enumerate(self.params):
-            self.t = self.t + 1
-            #if self.maximize:
-            #    grad = -t.grad.data
-            #else:
-            #    grad = t.grad.data
+            self.t += 1  
+            if self.maximize:
+                grad = -t.grad.data
+            else:
+                grad = t.grad.data
             self.m[i] = self.b1 * self.m[i] + (1 - self.b1) * t.grad
             self.v[i] = self.b2 * self.v[i] + (1 - self.b2) * np.square(t.grad)
             mhat = self.m[i] / (1. - self.b1**self.t)
