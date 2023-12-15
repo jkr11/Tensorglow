@@ -1,4 +1,3 @@
-from tensor import Tensor
 import numpy as np
 import requests
 import gzip

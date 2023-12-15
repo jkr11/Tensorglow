@@ -23,7 +23,6 @@ class SGD(Optimizer):
             t.data -= self.lr * t.grad
             
     
-    
 class RMSProp(Optimizer):
     def __init__(self, params, lr=0.001,eps=1e-8,mu=0.9): # mu = decay, lr=0.001, decay = 0.9, eps = 1e-8
         super(RMSProp, self).__init__(params)

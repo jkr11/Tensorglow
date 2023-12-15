@@ -1,13 +1,17 @@
 import numpy as np
 from functools import partialmethod
+from typing import Optional, Union
 
+
+  
 
 class Tensor:
-  def __init__(self, data):
+  def __init__(self, data:Union[None, np.ndarray, int, float, bytes], requires_grad:Optional[bool]=None):
     #print(f"Using Tensor of type {type(data)} with {data}")
     self.data = data
-    self.grad = None
-    self.context = None
+    self.grad:Optional[Tensor] = None
+    self.context:Optional[Function] = None
+    self.requires_grad:Optional[bool] = None
 
   def __repr__(self):
     return "Tensor %r with grad %r" % (self.data, self.grad)
@@ -51,20 +55,21 @@ class Tensor:
   def flatten(self):
     return self.data.reshape((-1, ))
 
-# An instantiation of the Function is the Context
 class Function:
-  def __init__(self, *tensors):
+  def __init__(self, *tensors:Tensor):
     self.parents = tensors
     self.saved_tensors = []
+    self.grads = [t.requires_grad for t in tensors]
+    self.requires_grad = True if any(self.grads) else None if None in self.grads else False
 
   def save_for_backward(self, *x):
     self.saved_tensors.extend(x)
 
   # note that due to how partialmethod works, self and arg are switched
-  def apply(self, arg, *x):
+  def apply(self, arg, *x:Tensor) -> Tensor:
     ctx = arg(self, *x)
     ret = Tensor(arg.forward(ctx, self.data, *[t.data for t in x]))
-    ret.context = ctx
+    if ctx.requires_grad: ret.context = ctx
     return ret
 
 def register(name, fxn):
@@ -144,6 +149,13 @@ class Sum(Function):
     input, = ctx.saved_tensors
     return grad_output * np.ones_like(input)
 register('sum', Sum)
+
+class Softmax(Function):
+  @staticmethod
+  def forward(ctx, input):
+    m = input-input.max(axis=1)
+    e = np.max(m)
+    return e / e.sum(axis=1)
 
 class LogSoftmax(Function):
   @staticmethod
